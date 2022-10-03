@@ -1,29 +1,155 @@
-body {
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+:root {
+    --width: 50vw;
+    --height: 50vh;
+    --size: calc((var(--width)-80) / 3)
+}
+
+body, main {
     height: 100%;
     width: 100%;
     position: fixed;
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: space-between;
+    transition: background-color .5s;
+    font-family: 'Nunito', sans-serif;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+#topholder, #bottomholder {
+    min-height: calc(3rem + 20px);
+    max-height: 20vh;
+    width: calc((var(--size) * 3 ) + 40px);
+    z-index: 2;
+    display: flex;
+}
+
+#top, #bottom {
+    height: 100%;
+    width: 100%;
+    box-shadow: 0px 0px 40px #00000020;
+    transition: background-color .5s;
+}
+
+.barinner {
+    height: calc(3rem + 20px);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    transition: background-color .5s;
+}
+
+.none {
+    display: none !important;
+}
+
+.transparent {
+    opacity: 0 !important;
+}
+
+#top .barinner div {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    transition: opacity .25s;
+    opacity: 1;
+}
+
+#time {
+    width: 100%;
+}
+
+#top .barinner div p {
+    min-width: 33%;
+    z-index: 3;
+}
+
+#timeleft p {
+    height: 2rem;
+}
+
+#progressholder {
+    position: absolute;
+    width: calc((var(--size) * 3 ) + 40px ) !important;
+    height: calc(3rem + 20px);
+    padding: 20px;
+}
+
+#progressbar {
+    height: 2rem;
+    width: 100%;
+    border-radius: calc(var(--size)*.10);
+}
+
+.score {
+    display: flex;
     justify-content: center;
+    align-items: center;
+    /* flex-direction: row; */
+}
+
+.score p {
+    font-size: 2rem;
+    margin-left: .5rem;
+}
+
+.score svg {
+    max-height: 2rem;
+    max-width: 2rem;
+}
+
+.hide {
+    height: 0;
+}
+
+#top {
+    border-radius: 0px 0px calc(var(--size)*.15) calc(var(--size)*.15);
+}
+
+#bottom {
+    border-radius: calc(var(--size)*.15) calc(var(--size)*.15) 0px 0px;
+    transition: .5s;
+    align-self: flex-end;
 }
 
 #gridholder {
+    /* max-height: 90vh; */
     display: grid;
-    grid-template-columns: auto auto auto;
-    gap: 20px;
-    padding: 20px;
-    border-radius: 40px;
+    grid-template-columns: var(--size) var(--size) var(--size);
+    grid-template-rows: var(--size) var(--size);
+    gap: 10px;
+    padding: 15px;
+    border-radius: calc(var(--size)*.15);
     box-shadow: 0px 0px 40px #00000020;
     z-index: 2;
+    transition: background-color .5s;
 }
 
 .tile {
-    height: 200px;
-    width: 200px;
-    border-radius: 20px;
+    border-radius: 10%;
+    margin: 5px;
+    transition: margin .1s, background-color .5s;
 }
 
-svg {
+.tile:hover {
+    margin: 0px;
+}
+
+.tile:active {
+    margin: 10px;
+}
+
+#svgholder {
     position: absolute;
     z-index: 1;
     top: 0;
@@ -32,17 +158,25 @@ svg {
     right: 0;
     width: 100%;
     height: 100%;
-    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-svg path {
-    stroke-dasharray: 1000,500,1000,500;
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+#svgholder svg path {
+    stroke-dasharray: 250,250,500,250,250,500;
     animation: squiggle 10s linear;
     animation-iteration-count: infinite;
-    stroke: #fff;
     stroke-width:10px;
     stroke-linecap:round;
     fill:transparent;
+    transform: rotate(-45deg);
+    transition: background-color .5s;
 }
 
 svg path:nth-child(even) {
@@ -51,6 +185,22 @@ svg path:nth-child(even) {
 
 @keyframes squiggle {
     to {
-        stroke-dashoffset: -3000;
+        stroke-dashoffset: -2000;
+    }
+}
+
+@media only screen and (orientation: portrait) {
+    :root {
+        --size: calc((var(--height)-80)/3)
+    }
+    #topholder, #bottomholder {
+        width: calc((var(--size) * 2 ) + 40px );
+    }
+    #progressholder {
+        width: calc((var(--size) * 2 ) + 40px ) !important;
+    }
+    #gridholder {
+        grid-template-columns: var(--size) var(--size);
+        grid-template-rows: var(--size) var(--size) var(--size);
     }
 }
