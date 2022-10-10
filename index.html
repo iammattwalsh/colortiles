@@ -11,36 +11,91 @@
     <script src="script.js" defer></script>
 </head>
 <body id="app">
-    <div id="topholder">
+    <div id="topholder" :class="[ gameActive ? '' : 'hide' ]">
         <div id="top">
             <div class="barinner">
-                <div id="start" :class="[ status != 0 ? 'none' : '', trans ? 'transparent' : '' ]">
-                    <p @click="incStatus">start game</p>
-                </div>
-                <div id="time" :class="[ status != 1 ? 'none' : '', trans ? 'transparent' : '' ]">
-                    <p @click="setTimeInit(180)">3m</p>
-                    <p @click="setTimeInit(60)">1m</p>
-                    <p @click="setTimeInit(30)">30s</p>
-                </div>
-                <div id="timeleft" :class="[ status != 2 ? 'none' : '', trans ? 'transparent' : '' ]">
-                    <p>{{ timeLeftDisp }}</p>
+                <div id="timeleft">
                     <div id="progressholder">
-                        <div id="progressbar"></div>
+                        <div id="progressbar">
+                            <p id="timeleftp">{{ timeLeft }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div id="gridholder">
-        <div class="tile" v-for="tile in numTiles" @click="reportTile(tile)"></div>
+    <div id="midholder" :class="[ trans ? 'transparent' : '' ]">
+        <div id="welcomecard" :class="[ status != 0 ? 'none' : '' ]">
+            <h2>
+                <p>Welcome to Tile Tapper!</p>
+            </h2>
+            <p>Tap the tile that's a different color than the rest.</p>
+            <div id="highscore">
+                <div class="scorebox">
+                    <p>Last: {{ statLastGame.perc }}% (</p>
+                    <div class="score">
+                        <svg viewbox="0 0 100 100">
+                            <path d="M80 20 L40 80"/>
+                            <path d="M40 80 L20 60"/>
+                        </svg>
+                    </div>
+                    <p>
+                        {{ statLastGame.correct }}
+                    </p>
+                    <div class="score">
+                        <svg viewbox="0 0 100 100">
+                            <path d="M20 20 L80 80"/>
+                            <path d="M20 80 L80 20"/>
+                        </svg>
+                    </div>
+                    <p>
+                        {{ statLastGame.incorrect }})
+                    </p>
+                </div>
+                <div class="scorebox">
+                    <p>Best: {{ statBestGame.perc }}% (</p>
+                    <div class="score">
+                        <svg viewbox="0 0 100 100">
+                            <path d="M80 20 L40 80"/>
+                            <path d="M40 80 L20 60"/>
+                        </svg>
+                    </div>
+                    <p>
+                        {{ statBestGame.correct }}
+                    </p>
+                    <div class="score">
+                        <svg viewbox="0 0 100 100">
+                            <path d="M20 20 L80 80"/>
+                            <path d="M20 80 L80 20"/>
+                        </svg>
+                    </div>
+                    <p>
+                        {{ statBestGame.incorrect }})
+                    </p>
+                </div>
+            </div>
+            <p>To start, choose a game length below:</p>
+            <div id="timeselect">
+                <a href="#" @click="selectGameTime(180)"><p>3min</p></a>
+                <a href="#" @click="selectGameTime(60)"><p>1min</p></a>
+                <a href="#" @click="selectGameTime(30)"><p>30sec</p></a>
+
+            </div>
+        </div>
+        <div id="countdown" :class="[ status != 1 ? 'none' : '' ]">
+            <p>{{ countdown }}</p>
+        </div>
+        <div id="gridholder" :class="[ status != 2 ? 'none' : '' ]">
+            <div class="tile" v-for="tile in numTiles" @click="reportTile(tile)"></div>
+        </div>
     </div>
-    <div id="bottomholder">
+    <div id="bottomholder" :class="[ gameActive ? '' : 'hide' ]">
         <div id="bottom">
             <div class="barinner">
                 <div class="score">
                     <svg viewbox="0 0 100 100">
-                        <path d="M80 20 L40 80" stroke="green" stroke-width="20" stroke-linecap="round" />
-                        <path d="M40 80 L20 60" stroke="green" stroke-width="20" stroke-linecap="round" />
+                        <path d="M80 20 L40 80"/>
+                        <path d="M40 80 L20 60"/>
                     </svg>
                     <p>
                         {{ correct }}
@@ -48,8 +103,8 @@
                 </div>
                 <div class="score">
                     <svg viewbox="0 0 100 100">
-                        <path d="M20 20 L80 80" stroke="red" stroke-width="20" stroke-linecap="round" />
-                        <path d="M20 80 L80 20" stroke="red" stroke-width="20" stroke-linecap="round" />
+                        <path d="M20 20 L80 80"/>
+                        <path d="M20 80 L80 20"/>
                     </svg>
                     <p>
                         {{ incorrect }}
@@ -59,23 +114,22 @@
         </div>
     </div>
     <div id="svgholder">
-        <svg>
-            <path d="M-100 50 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-250 200 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-400 350 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-550 500 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-700 650 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-850 800 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-1000 950 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-1150 1100 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-1300 1250 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-1450 1400 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-1600 1550 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-1750 1700 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-1900 1850 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
-            <path d="M-2050 2000 q50 -80 100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0 t100 0"/>
+        <svg viewbox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <path d="M-50 150 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 300 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 450 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 600 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 750 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 900 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 1050 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 1200 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 1350 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 1500 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 1650 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 1800 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
+            <path d="M-50 1950 q-25 -75 50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50 t50 -50"/>
         </svg>
-
+    
     </div>
 </body>
 </html>
