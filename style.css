@@ -6,6 +6,20 @@
     --size: calc((var(--width)-80) / 3)
 }
 
+* {
+    transition: background-color .5s ease-in-out 0s,
+                color .5s ease-in-out 0s,
+                stroke .5s ease-in-out 0s,
+                text-shadow .5s ease-in-out 0s,
+                opacity .25s ease-in-out 0s,
+                margin .1s ease-in-out 0s,
+                height .5s ease-in-out 0s,
+                top .5s ease-in-out 0s,
+                bottom .5s ease-in-out 0s,
+                width 1s linear 0s
+                !important;
+}
+
 body, main {
     height: 100%;
     width: 100%;
@@ -13,8 +27,7 @@ body, main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    transition: background-color .5s;
+    justify-content: space-around;
     font-family: 'Nunito', sans-serif;
     font-size: 2rem;
     font-weight: bold;
@@ -28,16 +41,91 @@ p {
 #topholder, #bottomholder {
     min-height: calc(3rem + 20px);
     max-height: 20vh;
-    width: calc((var(--size) * 3 ) + 40px);
+    width: calc((var(--size) * 3 ) + 50px);
     z-index: 2;
     display: flex;
+    position: absolute;
+}
+
+#topholder {
+    top: 0;
+}
+
+#bottomholder {
+    bottom: 0;
+}
+
+#topholder.hide {
+    top: calc((3rem + 20px) * -1);
+}
+
+#bottomholder.hide {
+    bottom: calc((3rem + 20px) * -1);
+}
+
+#midholder {
+    width: calc((var(--size) * 3 ) + 50px);
+    border-radius: calc(var(--size)*.15);
+    box-shadow: 0px 0px 40px #00000020;
+    padding: 15px;
+    z-index: 2;
+}
+
+#welcomecard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#welcomecard h2 {
+    margin: 0 0 20px 0;
+}
+
+#highscore {
+    margin: 20px 0;
+}
+
+#timeselect {
+    width: 100%;
+    display: flex;
+}
+
+#timeselect a {
+    width: 33%;
+    text-decoration: none;
+    margin: 10px 0;
+}
+
+#highscore {
+    display: flex;
+    flex-direction: column;
+}
+
+.scorebox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#midholder svg {
+    height: 2rem;
+    width: 2rem;
+}
+
+#countdown {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20rem;
 }
 
 #top, #bottom {
     height: 100%;
     width: 100%;
     box-shadow: 0px 0px 40px #00000020;
-    transition: background-color .5s;
+    overflow: hidden;
 }
 
 .barinner {
@@ -46,7 +134,6 @@ p {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    transition: background-color .5s;
 }
 
 .none {
@@ -57,32 +144,16 @@ p {
     opacity: 0 !important;
 }
 
-#top .barinner div {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    transition: opacity .25s;
-    opacity: 1;
-}
-
-#time {
-    width: 100%;
-}
-
-#top .barinner div p {
-    min-width: 33%;
-    z-index: 3;
-}
-
 #timeleft p {
     height: 2rem;
 }
 
 #progressholder {
-    position: absolute;
-    width: calc((var(--size) * 3 ) + 40px ) !important;
+    width: calc((var(--size) * 3 ) + 50px ) !important;
     height: calc(3rem + 20px);
     padding: 20px;
+    display: flex;
+    justify-content: center;
 }
 
 #progressbar {
@@ -95,7 +166,6 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* flex-direction: row; */
 }
 
 .score p {
@@ -108,8 +178,9 @@ p {
     max-width: 2rem;
 }
 
-.hide {
-    height: 0;
+.score svg path {
+    stroke-width: 20;
+    stroke-linecap: round;
 }
 
 #top {
@@ -118,27 +189,20 @@ p {
 
 #bottom {
     border-radius: calc(var(--size)*.15) calc(var(--size)*.15) 0px 0px;
-    transition: .5s;
     align-self: flex-end;
 }
 
 #gridholder {
-    /* max-height: 90vh; */
     display: grid;
     grid-template-columns: var(--size) var(--size) var(--size);
     grid-template-rows: var(--size) var(--size);
     gap: 10px;
-    padding: 15px;
-    border-radius: calc(var(--size)*.15);
-    box-shadow: 0px 0px 40px #00000020;
     z-index: 2;
-    transition: background-color .5s;
 }
 
 .tile {
     border-radius: 10%;
     margin: 5px;
-    transition: margin .1s, background-color .5s;
 }
 
 .tile:hover {
@@ -163,7 +227,7 @@ p {
     align-items: center;
 }
 
-svg {
+#svgholder svg, #bottom svg {
     width: 100%;
     height: 100%;
 }
@@ -175,11 +239,9 @@ svg {
     stroke-width:10px;
     stroke-linecap:round;
     fill:transparent;
-    transform: rotate(-45deg);
-    transition: background-color .5s;
 }
 
-svg path:nth-child(even) {
+#svgholder svg path:nth-child(even) {
     animation-direction: reverse;
 }
 
@@ -193,8 +255,15 @@ svg path:nth-child(even) {
     :root {
         --size: calc((var(--height)-80)/3)
     }
-    #topholder, #bottomholder {
+    body,main {
+        font-size: 1.5rem;
+    }
+    #topholder, #bottomholder, #midholder {
         width: calc((var(--size) * 2 ) + 40px );
+    }
+    #midholder svg {
+        height: 1.5rem;
+        width: 1.5rem;
     }
     #progressholder {
         width: calc((var(--size) * 2 ) + 40px ) !important;

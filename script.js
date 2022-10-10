@@ -26,17 +26,34 @@ createApp({
             lMode: 1,
             sMode: 1,
             numTiles: 6,
-            status: 0,
-            trans: 0,
             countdown: 3,
-            timeLeft: 0,
-            timeLeftDisp: 0,
+            gameLength: 1,
+            timeLeft: 1,
             correct: 0,
             incorrect: 0,
             diffTile: '',
+            gameActive: 0,
+            status: 0,
+            trans: 0,
+            statLastGame: {
+                perc: 0,
+                correct: 0,
+                incorrect: 0,
+            },
+            statBestGame: {
+                perc: 0,
+                correct: 0,
+                incorrect: 0,
+            },
         }
     },
     created() {
+        if (localStorage.getItem('lastGame')) {
+            this.statLastGame = JSON.parse(localStorage.getItem('lastGame'))
+        }
+        if (localStorage.getItem('bestGame')) {
+            this.statBestGame = JSON.parse(localStorage.getItem('bestGame'))
+        }
     },
     mounted() {
         this.selectElements()
@@ -46,14 +63,15 @@ createApp({
     methods: {
         selectElements() {
             this.elements.body = document.querySelector('body')
-            this.elements.gridHolder = document.getElementById('gridholder')
+            this.elements.midHolder = document.getElementById('midholder')
             this.elements.topBar = document.getElementById('top')
             this.elements.bottomBar = document.getElementById('bottom')
             this.elements.tiles = document.getElementsByClassName('tile')
             this.elements.paths = document.getElementsByTagName('path')
             this.elements.bars = document.getElementsByClassName('barinner')
-            this.elements.timeLeft = document.getElementById('timeleft')
+            this.elements.timeLeft = document.getElementById('timeleftp')
             this.elements.progressBar = document.getElementById('progressbar')
+            this.elements.pTags = document.getElementsByTagName('p')
         },
         selectDiffTile() {
             this.diffTile = this.elements.tiles[Math.floor(Math.random() * this.numTiles)]
@@ -94,71 +112,110 @@ createApp({
             for (let i = 0; i < this.elements.paths.length; i++) {
                 this.elements.paths[i].style.stroke = this.mainColor
             }
-            
             for (let i = 0; i < this.elements.bars.length; i++) {
                 this.elements.bars[i].style.color = this.mainColor
             }
+            for (let i = 0; i < this.elements.pTags.length; i++) {
+                this.elements.pTags[i].style.color = this.mainColor
+            }
+
             this.elements.timeLeft.style.color = this.bgColor
             this.elements.timeLeft.style.textShadow = `1px 1px ${this.mainColor}, -1px 1px ${this.mainColor}, -1px -1px ${this.mainColor}, 1px -1px ${this.mainColor}, 2px 0px ${this.mainColor}, -2px 0px ${this.mainColor}, 0px 2px ${this.mainColor}, 0px -2px ${this.mainColor}`
             this.elements.progressBar.style.backgroundColor = this.mainColor
             this.elements.body.style.backgroundColor = this.bgColor
             this.elements.topBar.style.backgroundColor = this.bgColor
             this.elements.bottomBar.style.backgroundColor = this.bgColor
-            this.elements.gridHolder.style.backgroundColor = this.bgColor
+            this.elements.midHolder.style.backgroundColor = this.bgColor
             for (let i = 0; i < this.elements.tiles.length; i++) {
                 this.elements.tiles[i].style.backgroundColor = this.mainColor
             }
             this.diffTile.style.backgroundColor = this.diffColor
         },
-
-
-
-
-        incStatus() {
-            if (this.status < 2) {
-                this.trans = 1
-                setTimeout(() => {
-                    this.status++
-                },125)
-                setTimeout(() => {
-                    this.trans = 0
-                },250)
-            } else {
-                this.updateCountdown()
-                this.status = 0
-            }
-            setTimeout(() => {
-                if (this.status == 2) {
-                    this.updateCountdown()
-                }
-            },125)
-        },
-        setTimeInit(selection) {
+        selectGameTime(selection) {
+            this.gameLength = selection
             this.timeLeft = selection
-            this.timeLeftDisp = this.timeLeft + 's'
-            this.incStatus()
+            this.trans = 1
+            setTimeout(() => {
+                this.status = 1
+                this.trans = 0
+                this.runGameCountdown()
+            }, 250)
         },
-        updateCountdown() {
-            this.timeLeftDisp = this.countdown
-            setInterval(() => {
+        runGameCountdown() {
+            this.countdown = 3
+            this.chooseColors()
+            let countdownInterval = setInterval(() => {
                 if (this.countdown > 1) {
+                    this.chooseColors()
                     this.countdown--
-                    this.timeLeftDisp = this.countdown
                 } else {
-                    this.timeLeftDisp = this.timeLeft
+                    this.trans = 1
+                    clearInterval(countdownInterval)
+                    this.startGame()
                 }
             },1000)
         },
-
-
-
-
-
-
+        startGame() {
+            this.correct = 0
+            this.incorrect = 0
+            this.chooseColors()
+            setTimeout(() => {
+                this.gameActive = 1
+                this.status = 2
+                this.trans = 0
+                this.runGame()
+            }, 250)
+        },
+        runGame() {
+            this.elements.progressBar.style.width = `${(this.timeLeft / this.gameLength) * 100}%`
+            let gameInterval = setInterval(() => {
+                if (this.timeLeft > 1) {
+                    this.timeLeft--
+                    this.elements.progressBar.style.width = `${(this.timeLeft / this.gameLength) * 100}%`
+                } else {
+                    clearInterval(gameInterval)
+                    this.trans = 1
+                    this.endGame()
+                }
+            },1000)
+        },
+        endGame() {
+            this.calcStats()
+            setTimeout(() => {
+                this.gameActive = 0
+                this.status = 0
+                this.trans = 0
+            }, 250)
+        },
+        calcStats() {
+            this.statLastGame.correct = this.correct
+            this.statLastGame.incorrect = this.incorrect
+            if (this.correct > 0 && this.incorrect > 0) {
+                this.statLastGame.perc = Math.round((this.correct / (this.correct + this.incorrect)) * 100)
+            } else {
+                this.statLastGame.perc = 0
+            }
+            if (this.statLastGame.perc > this.statBestGame.perc || (this.statLastGame.perc == this.statBestGame.perc && this.statLastGame.correct > this.statBestGame.correct)) {
+                this.statBestGame.correct = this.correct
+                this.statBestGame.incorrect = this.incorrect
+                if (this.correct > 0 && this.incorrect > 0) {
+                    this.statBestGame.perc = Math.round((this.correct / (this.correct + this.incorrect)) * 100)
+                } else {
+                    this.statBestGame.perc = 0
+                }
+            }
+            this.saveToLocal()
+        },
+        saveToLocal () {
+            const parsedLastGame = JSON.stringify(this.statLastGame)
+            localStorage.setItem('lastGame', parsedLastGame)
+            const parsedBestGame = JSON.stringify(this.statBestGame)
+            localStorage.setItem('bestGame', parsedBestGame)
+        },
         reportTile(tile) {
-            console.log(this.diffTile == this.elements.tiles[tile - 1])
             if (this.diffTile == this.elements.tiles[tile - 1]) {
                 this.correct++
+                this.diffCur *= .95
             } else {
                 this.incorrect++
             }
