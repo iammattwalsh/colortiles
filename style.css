@@ -3,7 +3,7 @@
 :root {
     --width: 50vw;
     --height: 50vh;
-    --size: calc((var(--width)-80) / 3)
+    --size: calc((var(--width) - 80px) / 3)
 }
 
 * {
