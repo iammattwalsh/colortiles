@@ -205,10 +205,6 @@ p {
     margin: 5px;
 }
 
-.tile:hover {
-    margin: 0px;
-}
-
 .tile:active {
     margin: 10px;
 }
@@ -248,6 +244,12 @@ p {
 @keyframes squiggle {
     to {
         stroke-dashoffset: -2000;
+    }
+}
+
+@media (hover: hover) {
+    .tile:hover {
+        margin: 0px;
     }
 }
 
