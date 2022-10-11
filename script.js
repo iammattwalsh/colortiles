@@ -156,6 +156,7 @@ createApp({
             },1000)
         },
         startGame() {
+            this.diffCur = this.diffStart
             this.correct = 0
             this.incorrect = 0
             this.chooseColors()
