@@ -253,7 +253,7 @@ p {
 
 @media only screen and (orientation: portrait) {
     :root {
-        --size: calc((var(--height)-80)/3)
+        --size: calc((var(--height) - 80px) / 3)
     }
     body,main {
         font-size: 1.5rem;
