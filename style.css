@@ -263,9 +263,12 @@ p {
     #topholder, #bottomholder, #midholder {
         width: calc((var(--size) * 2 ) + 40px );
     }
+    .scorebox p {
+        font-size: 1rem;
+    }
     #midholder svg {
-        height: 1.5rem;
-        width: 1.5rem;
+        height: 1rem;
+        width: 1rem;
     }
     #progressholder {
         width: calc((var(--size) * 2 ) + 40px ) !important;
